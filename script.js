@@ -30,7 +30,13 @@ function getIngredients() {
   // 3. Resolve with "Ingredients ready"
 
   return new Promise((resolve, reject) => {
+
     // Your code here
+    showMessage("Gathering ingredients...");
+    
+    wait(2000).then( _ => {
+      resolve("Ingredients ready")
+    });
   });
 }
 
@@ -38,12 +44,23 @@ function getIngredients() {
 function blendSmoothie() {
   // TODO:
   // 1. Show message: "Blending smoothie..."
+
   // 2. Wait 3 seconds
   // 3. Sometimes FAIL (see assignment instructions)
   // 4. Otherwise resolve with "Smoothie blended"
 
   return new Promise((resolve, reject) => {
-    // Your code here
+
+    showMessage("Blending smoothie...");
+    
+    wait(3000).then(() => {
+      if(Math.random() > .3) {
+        resolve("Smoothie blended");
+      }
+      else {
+        reject("ERROR: Blender broke!");
+      }
+    });
   });
 }
 
@@ -55,6 +72,10 @@ function pourSmoothie() {
   // 3. Resolve with "Smoothie is ready!"
 
   return new Promise((resolve, reject) => {
+    showMessage("Pouring into cup...");
+    wait(1000).then(() => { 
+      resolve("Smoothie is ready!");        
+    })
     // Your code here
   });
 }
@@ -64,14 +85,20 @@ function pourSmoothie() {
 ========================= */
 
 function makeSmoothieWithPromises() {
+  button.disabled = true; 
   outputDiv.innerHTML = ""; // Clear previous messages
 
   // TODO: Chain the steps in order using .then()
-  // getIngredients()
-  //   .then(...)
-  //   .then(...)
-  //   .then(...)
-  //   .catch(...)
+  getIngredients()
+  .then(blendSmoothie)
+  .then(pourSmoothie)
+  .then(() => {
+    showMessage("Smoothie blended succesfully");
+  })
+  .catch(error => {
+    showMessage(error);
+  });
+  button.disabled = false;
 }
 
 /* =========================
@@ -79,13 +106,24 @@ function makeSmoothieWithPromises() {
 ========================= */
 
 async function makeSmoothieAsync() {
+  button.disabled = true; // Disable button to prevent multiple clicks, this error 
+  //courtesy of my roommate who i asked to test the program and immediately broke it 
   outputDiv.innerHTML = ""; // Clear previous messages
 
   // TODO:
   // Use try/catch
-  // await getIngredients()
-  // await blendSmoothie()
-  // await pourSmoothie()
-  // Show final success message
+  try {
+    const ingredientsMessage = await getIngredients();
+    const blendMessage = await blendSmoothie();
+    const pourMessage = await pourSmoothie();
+    showMessage("Smoothie blended succesfully");
+  }
+  catch(err) {
+    showMessage(err);
+  }
   // Catch and display any errors
+  button.disabled = false; // 
 }
+
+button.onclick = makeSmoothieAsync;
+//button.onclick = makeSmoothieWithPromises; 
